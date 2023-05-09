@@ -16,7 +16,10 @@
           - [追加するファイル](#追加するファイル)
       - [ID1-2](#id1-2)
         - [シーケンス図](#シーケンス図)
-          - [画像データCSV](#画像データcsv)
+          - [images.csv、team.csvからのデータ取得](#imagescsvteamcsvからのデータ取得)
+          - [rankingImage.csv、searchWordsRanking.csv、recommendImage.csv、suggestWord.csvからのデータ取得](#rankingimagecsvsearchwordsrankingcsvrecommendimagecsvsuggestwordcsvからのデータ取得)
+          - [hotTopicTags.csvからのデータ取得](#hottopictagscsvからのデータ取得)
+          - [gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csvからのデータ取得](#gamescenetagscsvmanagertagscsvgametypetagscsvsituationtagscsvからのデータ取得)
     - [ID1-3](#id1-3)
       - [CSVから取得したデータの変換](#csvから取得したデータの変換)
     - [ID2](#id2)
@@ -211,8 +214,85 @@
 ##### シーケンス図
 
 * ID1-1より、CSVファイルは11ファイル作成するため、それぞれの取得タイミングを決定する。
+* CSVファイルから取得した値は、dataでstaticな変数として保持する。2回目以降はその値を参照する。
+* CSVファイルの記載方法、CSVから取得したデータの加工はID1-3にて詳細を記載する。
+###### images.csv、team.csvからのデータ取得
 
-###### 画像データCSV
+* image、teamはどちらもMapオブジェクトの形で部品コンポーネントへ渡す。
+* imageからデータ取得する際は、imageの要素「teams」「tag」がteams.csv、tag.csvに存在するかのチェックを行う。(詳細はID2にて記載)
+* tag.csvは4つのcsvデータを合わせた値を参照するが、以下シーケンス図は省略している。詳細は[tagデータ取得](#gamescenetagscsvmanagertagscsvgametypetagscsvsituationtagscsvからのデータ取得)に記載。
+* 複数箇所あるが同様の方法のため、例としてHeroコンポーネントの場合を記載する。
+
+![picture 39](images/dd7c22907ae134a8ad4ba51ea92c4833c48dd47aafd3c4e335c3d434d2fdf58b.png)  
+
+* images.csvのデータを取得するときの関数
+
+| 関数名 | 役割 | 引数 | 引数型 | 引数役割 | 戻り値 | 戻り値型 | 戻り値役割 |
+|--------|------|------|--------|----------|--------|----------|------------|
+| getImage | 部品コンポーネントが表示するため画像データを返す。 | なし | - | - | imageMap | Mapオブジェクト | 画像データ |
+
+* team.csvのデータを取得するときの関数
+
+| 関数名 | 役割 | 引数 | 引数型 | 引数役割 | 戻り値 | 戻り値型 | 戻り値役割 |
+|--------|------|------|--------|----------|--------|----------|------------|
+| getTeam | 部品コンポーネントが表示するため球団データを返す。 | なし | - | - | teamMap | Mapオブジェクト | 球団データ |
+
+###### rankingImage.csv、searchWordsRanking.csv、recommendImage.csv、suggestWord.csvからのデータ取得
+
+* 上記CSVは、現システムでは部品コンポーネントに直接定義されていたものである。
+* それらをCSVファイルに移行させるため、取得した値を加工するためのファイルも追加する。
+* 4つのCSVあるが全て同じ実現方法のため、例としてRecommendImagesコンポーネントの場合を記載する。
+* rankingImage、recommendImageはimageの中に値が存在するか確認する処理を入れる。
+
+![picture 37](images/dbc3f87bec720238c9764167667e1fd6b8cd718ed205c45a3f35175463c71c48.png)  
+
+* rankingImage.csvのデータを取得するときの関数
+
+| 関数名 | 役割 | 引数 | 引数型 | 引数役割 | 戻り値 | 戻り値型 | 戻り値役割 |
+|--------|------|------|--------|----------|--------|----------|------------|
+| getRankingImage | 部品コンポーネントが表示するため人気写真ランキングデータを返す。 | なし | - | - | recommendImagesArray | stringの配列 | 人気写真ランキングデータ |
+
+* searchWordsRanking.csvのデータを取得するときの関数
+
+| 関数名 | 役割 | 引数 | 引数型 | 引数役割 | 戻り値 | 戻り値型 | 戻り値役割 |
+|--------|------|------|--------|----------|--------|----------|------------|
+| getSearchWordsRanking. | 部品コンポーネントが表示するため検索ワードランキングデータを返す。 | なし | - | - | searchWordsRankingArray | stringの配列 | 検索ワードランキングデータ |
+
+* recommendImage.csvのデータを取得するときの関数
+
+| 関数名 | 役割 | 引数 | 引数型 | 引数役割 | 戻り値 | 戻り値型 | 戻り値役割 |
+|--------|------|------|--------|----------|--------|----------|------------|
+| getRecommendImage. | 部品コンポーネントが表示するためおすすめワードランキングデータを返す。 | なし | - | - | recommendImageArray | stringの配列 | おすすめワードランキングデータ |
+
+* suggestWord.csvのデータを取得するときの関数
+
+| 関数名 | 役割 | 引数 | 引数型 | 引数役割 | 戻り値 | 戻り値型 | 戻り値役割 |
+|--------|------|------|--------|----------|--------|----------|------------|
+| getSuggestWord. | 部品コンポーネントが表示するためサジェストワードデータを返す。 | なし | - | - | suggestWordArray | stringの配列 | サジェストワードデータ |
+
+###### hotTopicTags.csvからのデータ取得
+
+![picture 35](images/c7c55ea4ed8d988eca4399f7e7513c49622d8a129553745488e063ef096b3299.png)  
+
+* hotTopicTags.csvのデータを取得するときの関数
+
+| 関数名 | 役割 | 引数 | 引数型 | 引数役割 | 戻り値 | 戻り値型 | 戻り値役割 |
+|--------|------|------|--------|----------|--------|----------|------------|
+| getHotTopicTags | 部品コンポーネントが表示するためホットトピックタグを返す。 | なし | - | - | hotTopicTagsArray | stringの配列 | ホットトピックタグデータ |
+
+###### gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csvからのデータ取得
+
+* 現システムで、タグは上記4つのCSVデータをまとめて参照されている。
+* 変更後もそれに従い、1つの関数で、全CSVファイルのタグを取得する。
+* tag CSVすべてのデータを合わせてgenresとする。
+
+![picture 41](images/2ebcbefc0a6bd5dbc65644dc71694f74624d05df11c05f588a9f68820585d405.png)  
+
+* genresを取得するときの関数
+
+| 関数名 | 役割 | 引数 | 引数型 | 引数役割 | 戻り値 | 戻り値型 | 戻り値役割 |
+|--------|------|------|--------|----------|--------|----------|------------|
+| getGenres | 部品コンポーネントが表示するためジャンル(全タグデータ)を返す。 | なし | - | - | genresArray | stringの配列 | ジャンルデータ |
 
 ### ID1-3
 
