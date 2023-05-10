@@ -12,14 +12,10 @@
           - [detail](#detail)
           - [search](#search)
         - [ファイル構成](#ファイル構成)
-          - [現iw-showroom-webappのファイル構成と変更箇所](#現iw-showroom-webappのファイル構成と変更箇所)
+          - [削除するファイル](#削除するファイル)
           - [追加するファイル](#追加するファイル)
       - [ID1-2](#id1-2)
         - [シーケンス図](#シーケンス図)
-          - [images.csv、team.csvからのデータ取得](#imagescsvteamcsvからのデータ取得)
-          - [rankingImage.csv、searchWordsRanking.csv、recommendImage.csv、suggestWord.csvからのデータ取得](#rankingimagecsvsearchwordsrankingcsvrecommendimagecsvsuggestwordcsvからのデータ取得)
-          - [hotTopicTags.csvからのデータ取得](#hottopictagscsvからのデータ取得)
-          - [gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csvからのデータ取得](#gamescenetagscsvmanagertagscsvgametypetagscsvsituationtagscsvからのデータ取得)
     - [ID1-3](#id1-3)
       - [CSVから取得したデータの変換](#csvから取得したデータの変換)
     - [ID2](#id2)
@@ -80,14 +76,15 @@
 * 部品コンポーネントがデータを参照する場合は、dataでCSVファイルからデータの取得を行い、取得した値を部品コンポーネントが使用できる形に加工し渡す。
 * components以上は、変更前と同じ値を受け取れるようにすることで、変更の影響を受けないようにする。
 
-
-![picture 16](images/876c12f6f7c58d4d5868f6b008f35d3007d31e39e1cdd266652db3738a631581.png)  
+![picture 42](images/0e671db68575bd214e4c35b5cc05bccdd1ac2d01a9144d01abfd3303d0dce4bd.png)  
 
 | 項目 | 変更前 | 変更後 | 
 |----------|--------|--------|
 | Pages | ページコンポーネントを表す。 | 変更なし |
 | components | 部品コンポーネントを表す。 | 変更なし |
-| data | データを記載しているtsファイル。その値を加工しているtsファイルを表す。 | CSVファイルからデータを取得し、componentsが使用する形に加工する。|
+| data | データを記載しているtsファイル。その値を加工しているtsファイルを表す。 | 削除。CSVファイルからのデータ取得、部品コンポーネントが使用する加工の2つの役割が必要になるため、それぞれ2つに分ける。 |
+| provider | なし | 部品コンポーネントが使用する形に加工する。|
+| gateway | なし | CSVファイルからデータを取得する。|
 | CSVファイル | なし | dataのtsファイルに記載されていた値を格納。 |
 
 ##### クラス図
@@ -98,26 +95,22 @@
 
 ###### topPage
 
-![picture 25](images/e42ebccad56a10d47ede95d90c30f3f4fd45fb4d8033e02df06535dc06ad5171.png)  
+![picture 43](images/602b4f4179da5e523dbaaf84df8c1f4db547b9e5b760052c77e80a157a3f57d0.png)  
+![picture 44](images/2e211075bcf99458e59e250dc7e229647a20bf4989312cb9027f1fa818c43f0b.png)  
 
 
 | クラス名 | 変更前 | 変更後 | 
 |----------|--------|--------|
 | topPage | ページコンポーネント、topPageを表す。 | 変更なし |
-| Hero | topPageの部品コンポーネント。imagesから表示データをexportして使用。 | imagesのデータ取得関数を呼び出して引数を使用。 |
-| NewImages | topPageの部品コンポーネント。imagesから表示データをexportして使用。 | imagesのデータ取得関数を呼び出して引数を使用。 |
-| Ranking | topPageの部品コンポーネントを表す。imagesから表示データをexportして使用。RANKING_IMAGES、SEARCH_WORDS_RANKINGは部品コンポーネントで定義し使用。 | images、rankingImage、searchWordsRankingのデータ取得関数を呼び出して引数を使用。 |
-| RecommendImages | topPageの部品コンポーネント。imagesから表示データをexportして使用。RECOMMEND_IMAGESは部品コンポーネントで定義し使用。 | images、recommendImagesのデータ取得関数を呼び出して引数を使用。 |
-| TopFreeWordFilter | topPageの部品コンポーネント。SUGGEST_WORDSは部品コンポーネントで定義し使用。 | suggestWordのデータ取得関数を呼び出して引数を使用。 |
-| TopHotTopics | topPageの部品コンポーネント。hotTopicから表示データをexportして使用。 | hotTopicsのデータ取得関数を呼び出して引数を使用。 |
-| TopTeams | topPageの部品コンポーネント。teamから表示データをexportして使用。 | teamのデータ取得関数を呼び出して引数を使用。 |
-| images | 画像の詳細情報と部品コンポーネント用の加工処理。 | CSVから画僧データの取得、取得データを部品コンポーネントが使用する形に加工する。|
-| rankingImage | なし | CSVファイルに移行したRANKING_IMAGESCを取得、取得データを部品コンポーネントが使用する形に加工する。|
-| searchWordsRanking | なし | CSVファイルに移行したSEARCH_WORDS_RANKINGを取得、取得データを部品コンポーネントが使用する形に加工する。|
-| recommendImages | なし | CSVファイルに移行したRECOMMEND_IMAGESを取得、取得データを部品コンポーネントが使用する形に加工する。|
-| suggestWords | なし | CSVファイルに移行したSUGGEST_WORDSを取得、取得データを部品コンポーネントが使用する形に加工する。|
-| hotTopics | 画像の詳細情報と部品コンポーネント用の加工処理。 | CSVからホットトピックタグデータの取得、取得データを部品コンポーネントが使用する形に加工する。|
-| team | 画像の詳細情報と部品コンポーネント用の加工処理。 | CSVからチームデータの取得、取得データを部品コンポーネントが使用する形に加工する。|
+| Hero | topPageの部品コンポーネント。imagesから表示データをexportして使用。 | proviserのデータ取得関数を呼び出して引数を使用。 |
+| NewImages | topPageの部品コンポーネント。imagesから表示データをexportして使用。 | proviserのデータ取得関数を呼び出して引数を使用。 |
+| Ranking | topPageの部品コンポーネントを表す。imagesから表示データをexportして使用。RANKING_IMAGES、SEARCH_WORDS_RANKINGは部品コンポーネントで定義し使用。 | proviserのデータ取得関数を呼び出して引数を使用。 |
+| RecommendImages | topPageの部品コンポーネント。imagesから表示データをexportして使用。RECOMMEND_IMAGESは部品コンポーネントで定義し使用。 | proviserのデータ取得関数を呼び出して引数を使用。 |
+| TopFreeWordFilter | topPageの部品コンポーネント。SUGGEST_WORDSは部品コンポーネントで定義し使用。 | proviserのデータ取得関数を呼び出して引数を使用。 |
+| TopHotTopics | topPageの部品コンポーネント。hotTopicから表示データをexportして使用。 | proviserのデータ取得関数を呼び出して引数を使用。 |
+| TopTeams | topPageの部品コンポーネント。teamから表示データをexportして使用。 | proviserのデータ取得関数を呼び出して引数を使用。 |
+| proviser | なし | 取得データを部品コンポーネントが使用する形に加工する。|
+| gateway | なし | CSVからデータ取得する。|
 | image.csv | なし | tsファイルに直接記載されていた画像データをCSVファイルに移行する。 |
 | rankingImage.csv | なし | tsファイルに直接記載されていた人気写真ランキング配列をCSVファイルに移行する。 |
 | searchWordsRanking.csv | なし | tsファイルに直接記載されていた検索ワードランキング配列をCSVファイルに移行する。 |
@@ -127,8 +120,8 @@
 | team.csv | なし | tsファイルに直接記載されていたチーム配列をCSVファイルに移行する。 |
 
 ###### detail
-
-![picture 26](images/44f97590c9cc16e3aa3d68c8c2009a28c61ecd2eb588cbfa764aeb107759a199.png)  
+![picture 45](images/c352ea7ef29b3c31390a17172a8bc55ba9219bf6fef1140e1131d012444c4b3b.png)  
+![picture 46](images/b570df8f0108523412719ba9c287c230a5115df06c92524948a17d9ffe9707d3.png)  
 
 | クラス名 | 変更前 | 変更後 | 
 |----------|--------|--------|
@@ -138,22 +131,25 @@
 | ButtonArea | detailの部品コンポーネント。 | 変更なし |
 | RelativeTags | detailの部品コンポーネント。 | 変更なし |
 | RelativeImages | detailの部品コンポーネント。 | 変更なし |
-| hooks | detailの部品コンポーネント。imagesから表示データをexportして使用。 | imagesのデータ取得関数を呼び出して引数を使用。 |
-| images | なし | topPageと同様。|
+| hooks | ユーザーにクリックされた画像データを取得する。imagesから表示データをexportして使用。 | proviserのデータ取得関数を呼び出して引数を使用。 |
+| provider | なし | 取得データを部品コンポーネントが使用する形に加工する。 |
+| gateway | なし | CSVからデータ取得する。|
 | image.csv | なし | topPageと同様。 |
 
 ###### search
 
-![picture 27](images/6dee95a2a2c92ded14af40baf38e18af8555b2df9352f00e8ad04bf32fbd188e.png)  
+ ![picture 47](images/4b3db1b415beba885bc121f00977d3d5e15eb0fdc1e4c53b57b4c4426f255512.png)  
+ ![picture 48](images/f44028ca07fa88ceb2538d25ce5e02d5958dadb3a0bab4cdc64e2d7bca3b63f8.png)  
 
 | クラス名 | 変更前 | 変更後 | 
 |----------|--------|--------|
 | search | ページコンポーネント、searchを表す。 | 変更なし |
-| Filters | searchの部品コンポーネント。tagから表示データをexportして使用。 | 変更なし |
+| Filters | searchの部品コンポーネント。tagから表示データをexportして使用。 | proviserのデータ取得関数を呼び出して引数を使用。 |
 | SelectedFilterTags | searchの部品コンポーネント。 | 変更なし |
 | FilteredImages | searchの部品コンポーネント。 | 変更なし |
 | Jotai | 現ページの状態(検索に使用している文字列、こだわり条件フィルタなど)を管理している。 | 変更なし |
-| tags | 全ジャンルのタグ配列を作成し、部品コンポーネントに渡す。 | 以下4つのCSVからタグデータの取得、取得データを部品コンポーネントが使用する形に加工する。|
+| provider | なし | 取得データを部品コンポーネントが使用する形に加工する。 |
+| gateway | なし | CSVからデータ取得する。|
 | gameSceneTags.csv | なし | tsファイルに直接記載されていた試合タイプタグ配列をCSVファイルに移行する。 |
 | managerTags.csv | なし | tsファイルに直接記載されていた選手以外タグ配列をCSVファイルに移行する。 |
 | gameTypeTags.csv | なし | tsファイルに直接記載されていた試合シーンタグ配列をCSVファイルに移行する。 |
@@ -161,38 +157,23 @@
 
 ##### ファイル構成
 
-* 現在のファイル構成と、変更後の修正内容を表にまとめる。
+* 現在のファイル構成から削除するファイルと、追加するファイルを以下表にまとめる。
 
-###### 現iw-showroom-webappのファイル構成と変更箇所
+###### 削除するファイル
 
-| フォルダ/ファイル |  |  | 概要 | 変更 |
-|-------------------|---|---|---|---|---|
-| assets |  | | 画像を格納。 | × |
-| chakra |  | |フォント、カラーなどの設定ファイル格納。 | × |
-| components | | | 複数ページに共通のコンポーネントを格納。 | × |
-| data | | | 画像などの表示に必要なデータを格納。 | - |
-| | images | index.ts | 画像データ(imagesArray)を部品コンポーネントが使用する形に加工する処理を格納。 | data.tsxから受け取ったデータを部品コンポーネントが使用する形に加工する。 |
-| | | data.ts | 画像データの二次元配列を格納。 | 元の配列はCSVファイルに移行。CSVから画像データを取得する処理を新規で作成。 |
-| | players | index.ts | 選手名の型を定義。 | 削除(詳細はID2参照) |
-| | | data.ts | 選手名の配列を格納。 | 削除(詳細はID2参照) |
-| | tags | index.ts | タグの型を定義。 | タグデータを部品コンポーネントが使用する形に加工する。 |
-| | | genres | タグの配列を格納。 | 元の配列はCSVファイルに移行。CSVからジャンルタグデータを取得する処理を新規で作成。 |
-| | | hotTopic.ts | タグの配列を格納。 | 元の配列はCSVファイルに移行。CSVからホットトピックタグデータを取得する処理を新規で作成。 |
-| | team | index.ts | チームデータを部品コンポーネントに渡すように加工している処理を格納。 | チームデータを部品コンポーネントが使用する形に加工する。 |
-| | | data.ts | チームデータの二次元配列を格納。 | 元の配列はCSVファイルに移行。CSVからチームデータを取得する処理を新規で作成。|
-| features | | | ページコンポーネントが使用する、部品コンポーネントを格納。 | 一部tsファイルに直接記載されているデータ配列はCSVファイルに移行。 |
-| functions | | | 複数ページに共通の関数を格納。 | × |
-| hooks | | | ページのルーターを行う関数を格納。 | × |
-| jotai | | | カート情報の状態を管理する関数を格納。 | × |
-| layouts | | | フッター、ヘッダー等の全ページに共通するコンポーネントを格納。 | × |
-| pages | | | ページコンポーネントを格納。 | × |
+| フォルダ/ファイル | 変更前 | 変更後 |
+|-------------------|--------|--------|
+| data | 画像などの表示に必要なデータを格納し、そのデータを加工して部品コンポーネントに渡す。 | データはCSVファイル、データの取得はgateway、加工はproviderで行う。 |
+| features | ページコンポーネントが使用する、部品コンポーネントを格納。 | 一部tsファイルに直接記載されているデータ配列はCSVファイルに移行。 |
 
 ###### 追加するファイル
 
-* 現在のファイル構成に、以下CSVファイルを追加する。
+* 現在のファイル構成に、以下ファイルを追加する。
 
 | フォルダ | ファイル名 | 概要 |
 |-------------------|------------|------|
+| provider | data-provider.ts | 取得データを部品コンポーネントが使用する形に加工する。 |
+| gateway | data-gateway.ts | CSVからデータ取得する。 |
 | csv | image.csv | 画像データCSV |
 | | rankingImage.csv | 人気写真ランキングCSV |
 | | searchWordsRanking.csv | 検索ワードランキングCSV |
@@ -214,16 +195,17 @@
 ##### シーケンス図
 
 * ID1-1より、CSVファイルは11ファイル作成するため、それぞれの取得タイミングを決定する。
-* CSVファイルから取得した値は、dataでstaticな変数として保持する。2回目以降はその値を参照する。
+* CSVファイルからデータを取得する際は、非同期処理で行う。その際、Promise.allを使用する。
+* 取得した値は、providerでstaticな変数として保持する。2回目以降はその値を参照する。
 * CSVファイルの記載方法、CSVから取得したデータの加工はID1-3にて詳細を記載する。
-###### images.csv、team.csvからのデータ取得
-
-* image、teamはどちらもMapオブジェクトの形で部品コンポーネントへ渡す。
 * imageからデータ取得する際は、imageの要素「teams」「tag」がteams.csv、tag.csvに存在するかのチェックを行う。(詳細はID2にて記載)
-* tag.csvは4つのcsvデータを合わせた値を参照するが、以下シーケンス図は省略している。詳細は[tagデータ取得](#gamescenetagscsvmanagertagscsvgametypetagscsvsituationtagscsvからのデータ取得)に記載。
+* tag.csvは4つのcsvデータを合わせた値を参照する。
 * 複数箇所あるが同様の方法のため、例としてHeroコンポーネントの場合を記載する。
 
-![picture 39](images/dd7c22907ae134a8ad4ba51ea92c4833c48dd47aafd3c4e335c3d434d2fdf58b.png)  
+![picture 49](images/5cdcda14b356b0be9ced1b29d9acb6cb310d16093814c8a56bce3d498d1e8a1c.png)  
+
+* データ取得が2回目以降
+![picture 50](images/1e1b98b82c601d0bb7b6a5e5fbcf11d9f12df70668166059a52bf460dbbf7f55.png)  
 
 * images.csvのデータを取得するときの関数
 
@@ -236,15 +218,6 @@
 | 関数名 | 役割 | 引数 | 引数型 | 引数役割 | 戻り値 | 戻り値型 | 戻り値役割 |
 |--------|------|------|--------|----------|--------|----------|------------|
 | getTeam | 部品コンポーネントが表示するため球団データを返す。 | なし | - | - | teamMap | Mapオブジェクト | 球団データ |
-
-###### rankingImage.csv、searchWordsRanking.csv、recommendImage.csv、suggestWord.csvからのデータ取得
-
-* 上記CSVは、現システムでは部品コンポーネントに直接定義されていたものである。
-* それらをCSVファイルに移行させるため、取得した値を加工するためのファイルも追加する。
-* 4つのCSVあるが全て同じ実現方法のため、例としてRecommendImagesコンポーネントの場合を記載する。
-* rankingImage、recommendImageはimageの中に値が存在するか確認する処理を入れる。
-
-![picture 37](images/dbc3f87bec720238c9764167667e1fd6b8cd718ed205c45a3f35175463c71c48.png)  
 
 * rankingImage.csvのデータを取得するときの関数
 
@@ -270,23 +243,11 @@
 |--------|------|------|--------|----------|--------|----------|------------|
 | getSuggestWord. | 部品コンポーネントが表示するためサジェストワードデータを返す。 | なし | - | - | suggestWordArray | stringの配列 | サジェストワードデータ |
 
-###### hotTopicTags.csvからのデータ取得
-
-![picture 35](images/c7c55ea4ed8d988eca4399f7e7513c49622d8a129553745488e063ef096b3299.png)  
-
 * hotTopicTags.csvのデータを取得するときの関数
 
 | 関数名 | 役割 | 引数 | 引数型 | 引数役割 | 戻り値 | 戻り値型 | 戻り値役割 |
 |--------|------|------|--------|----------|--------|----------|------------|
 | getHotTopicTags | 部品コンポーネントが表示するためホットトピックタグを返す。 | なし | - | - | hotTopicTagsArray | stringの配列 | ホットトピックタグデータ |
-
-###### gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csvからのデータ取得
-
-* 現システムで、タグは上記4つのCSVデータをまとめて参照されている。
-* 変更後もそれに従い、1つの関数で、全CSVファイルのタグを取得する。
-* tag CSVすべてのデータを合わせてgenresとする。
-
-![picture 41](images/2ebcbefc0a6bd5dbc65644dc71694f74624d05df11c05f588a9f68820585d405.png)  
 
 * genresを取得するときの関数
 
