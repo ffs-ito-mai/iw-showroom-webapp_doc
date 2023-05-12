@@ -19,7 +19,12 @@
           - [providerの関数](#providerの関数)
           - [gatewayの関数](#gatewayの関数)
     - [ID1-3](#id1-3)
-      - [CSVから取得したデータの変換](#csvから取得したデータの変換)
+      - [CSVの記載方法](#csvの記載方法)
+      - [CSVのデータ取得方法](#csvのデータ取得方法)
+      - [CSVデータの加工](#csvデータの加工)
+        - [image.csv、team.csv](#imagecsvteamcsv)
+        - [rankingImage.csv、searchWordsRanking.csv、recommendImage.csv、suggestWord.csv、hotTopicTags.csv](#rankingimagecsvsearchwordsrankingcsvrecommendimagecsvsuggestwordcsvhottopictagscsv)
+        - [gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csv](#gamescenetagscsvmanagertagscsvgametypetagscsvsituationtagscsv)
     - [ID2](#id2)
 
 | 版  | 日付         | 担当     | 修正箇所 | 修正内容 |
@@ -324,9 +329,30 @@
 | getGenresCSV | 部品コンポーネントが表示するためジャンル(全タグデータ)を返す。 | なし | - | - | genresArray | Promise配列 | ジャンルデータ |
 ### ID1-3
 
-#### CSVから取得したデータの変換
+#### CSVの記載方法
 
-* CSV→Mapオブジェクトの変換方法
+* 各要素は「,」で区切って記載する。
+* 要素が配列になっているものは「.」で区切る。
+
+#### CSVのデータ取得方法
+
+* 「fs.createReadStream」を使用する。
+
+#### CSVデータの加工
+
+##### image.csv、team.csv
+
+* 部品コンポーネントに渡すMapオブジェクトの形にするために必要な加工は以下になる。
+① データを入れた二次元配列から、各配列の1要素目(画像名、球団名)で配列を作成する。それをMapオブジェクトのキーとする。
+② 画像名位階の要素でオブジェクトを作成し、それをMapオブジェクトの値とする。
+
+##### rankingImage.csv、searchWordsRanking.csv、recommendImage.csv、suggestWord.csv、hotTopicTags.csv
+
+* 配列で使用するため加工は必要なし。
+
+##### gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csv
+
+* 配列の0番目(タグのジャンル)とそれ以外(タグ)で二次元配列を作成する。
 
 ### ID2
 
