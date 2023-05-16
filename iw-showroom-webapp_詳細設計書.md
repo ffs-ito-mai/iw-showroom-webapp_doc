@@ -22,10 +22,11 @@
       - [CSVの記載方法](#csvの記載方法)
       - [CSVのデータ取得方法](#csvのデータ取得方法)
       - [CSVデータの加工](#csvデータの加工)
-        - [image.csv、team.csv](#imagecsvteamcsv)
+        - [image.csv](#imagecsv)
         - [rankingImage.csv、searchWordsRanking.csv、recommendImage.csv、suggestWord.csv、hotTopicTags.csv](#rankingimagecsvsearchwordsrankingcsvrecommendimagecsvsuggestwordcsvhottopictagscsv)
         - [gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csv](#gamescenetagscsvmanagertagscsvgametypetagscsvsituationtagscsv)
     - [ID2](#id2)
+      - [実現方法](#実現方法)
 
 | 版  | 日付         | 担当     | 修正箇所 | 修正内容 |
 |----|------------|--------|------|------|
@@ -333,44 +334,168 @@
 
 * 各要素は「,」で区切って記載する。
 * 要素が配列になっているものは「.」で区切る。
+* 要素がないものは空欄にする。
+* priceは全ての画像データで同じため、CSVからデータ取得後に値を設定する。
+
+image.csv
+* 左から、画像名, 選手名, 球団名, 撮影年, 価格, 配信開始日,タ イトル, タグ, 兄弟写真, TOPのHeroエリアへの掲載有無の順で記載する。
+```
+221125O-0080e.jpg, 村上宗隆.岡林勇希.岡林勇希.近本光司, , 2022, prices, 2022-11-25, NPBアワードで表彰を受ける村上ら, NPBアワード.表彰, , false
+221125O-0114e.jpg, 山本由伸, , 2022, prices, 2022-11-25, 沢村賞を受賞し表彰を受ける山本由伸, NPBアワード.表彰, , false
+220727O-0001e_17.jpg, 佐々木朗希, ロッテ, 2022, prices, 2022-7-27, オールスター第二戦に登板する佐々木朗希, オールスター.投球, 220727O-0002e_17.jpg.220727O-0003e_17.jpg.220727O-0005e_17.jpg.220727O-0006e_17.jpg, false
+221022Bs-0066i_55.jpg, 村上宗隆, ヤクルト, 2022, prices, 2022-10-22, 日本シリーズ第一戦に出場する村上宗隆, 日本シリーズ.打撃, , true
+```
+team.csv
+* 左から、球団名, id, 旧球団名の順で記載する。
+```
+ヤクルト, yakult, central, 
+阪神, hanshin, central,
+オリックス, orix, pacific, 
+ロッテ, lotte, pacific, 
+```
+rankingImage.csv、searchWordsRanking.csv、recommendImage.csv、suggestWord.csv、hotTopicTags.csv
+```
+221030Bs-0004d.jpg, 220727O-0027g_17_md.jpg, 220727O-0037l_md.jpg, 220727O-0072g_17_md.jpg, 221030S-0062e_13_md.jpg
+```
+gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csv
+* 左から、タグのジャンル名, タグの順で記載する。
+```
+試合シーン, 投球.打撃.守備.走塁
+```
 
 #### CSVのデータ取得方法
 
-* 「fs.createReadStream」を使用する。
+* 「fs.createReadStream(path)」を使用する。
 
 #### CSVデータの加工
 
-##### image.csv、team.csv
+##### image.csv
+* csv→Mapオブジェクトに加工する。
+* そのために①-⑥を行う。
 
-* 部品コンポーネントに渡すMapオブジェクトの形にするために必要な加工は以下になる。
-① データを入れた二次元配列から、各配列の1要素目(画像名、球団名)で配列を作成する。それをMapオブジェクトのキーとする。
-② 画像名位階の要素でオブジェクトを作成し、それをMapオブジェクトの値とする。
+① csvのデータは二次元配列で取得する。
+```
+[
+    [221125O-0080e.jpg, 村上宗隆.岡林勇希.岡林勇希.近本光司, , 2022, prices, 2022-11-25, NPBアワードで表彰を受ける村上ら, NPBアワード.表彰, , false],
+    [221125O-0114e.jpg, 山本由伸, , 2022, prices, 2022-11-25, 沢村賞を受賞し表彰を受ける山本由伸, NPBアワード.表彰, , false]
+    [220727O-0001e_17.jpg, 佐々木朗希, ロッテ, 2022, prices, 2022-7-27, オールスター第二戦に登板する佐々木朗希, オールスター.投球, 220727O-0002e_17.jpg.220727O-0003e_17.jpg.220727O-0005e_17.jpg.220727O-0006e_17.jpg, false],
+    [221022Bs-0066i_55.jpg, 村上宗隆, ヤクルト, 2022, prices, 2022-10-22, 日本シリーズ第一戦に出場する村上宗隆, 日本シリーズ.打撃, , true]
+]
+```
+② ①で取得したデータから、画像名の配列を作成する。
+```
+[221125O-0080e.jpg, 221125O-0114e.jpg, 220727O-0001e_17.jpg, 221022Bs-0066i_55.jpg]
+```
+③ ①で取得したデータのうち、「.」で区切られている複数の値があるもの(playerNames、teams、tags)で配列を作成する。
+
+④priceの値を設定する。
+```
+      prices = [
+        {
+          label: "S",
+          description: ["72dpi 1020×768px"],
+          dataType: "jpg",
+          price: 1800,
+        },
+        {
+          label: "M",
+          description: ["360dpi 1920×1080px"],
+          dataType: "jpg",
+          price: 2800,
+        },
+      ],
+```
+
+⑤ ①で取得したデータから、1つの画像データにつき画像名以外でオブジェクトを作成する。それらを要素として配列を作成する。
+```
+[ { playerNames: [村上宗隆, 岡林勇希, 岡林勇希, 近本光司],
+  teams: [],
+  year: 2022,
+  prices: prices,
+  uploadDay: 2022-11-25,
+  title: NPBアワードで表彰を受ける村上ら,
+  tag: [NPBアワード,表彰],
+  relative: [],
+  pickup: false
+  },
+　{ playerNames: [山本由伸],
+  teams: [],
+  year: 2022,
+  prices: prices,
+  uploadDay: 2022-11-25,
+  title: 沢村賞を受賞し表彰を受ける山本由伸,
+  tag: [NPBアワード,表彰],
+  relative: [],
+  pickup: false
+  },
+  { playerNames: [佐々木朗希],
+  teams: [ロッテ],
+  year: 2022,
+  prices: prices,
+  uploadDay: 2022-7-27,
+  title: オールスター第二戦に登板する佐々木朗希,
+  tag: [オールスター,投球],
+  relative: [220727O-0002e_17.jpg, 220727O-0003e_17.jpg, 220727O-0005e_17.jpg, 220727O-0006e_17.jpg],
+  pickup: false
+  },
+  { playerNames: [村上宗隆],
+  teams: [ヤクルト],
+  year: 2022,
+  prices: prices,
+  uploadDay: 2022-10-22,
+  title: 日本シリーズ第一戦に出場する村上宗隆,
+  tag: [日本シリーズ, 打撃],
+  relative: [],
+  pickup: true
+  }
+]
+```
+
+⑥ ②と⑤で作成した配列から、②をキー、⑤を値としてMapオブジェクトを作成する。
+
+* ①はCSVDataGateway、②-⑥はCSVDataProviderで行う。
 
 ##### rankingImage.csv、searchWordsRanking.csv、recommendImage.csv、suggestWord.csv、hotTopicTags.csv
-
-* 配列で使用するため加工は必要なし。
+* csv→配列に加工する。
+* csvのデータは一次元配列で取得する。
+```
+[ 221030Bs-0004d.jpg, 220727O-0027g_17_md.jpg, 220727O-0037l_md.jpg, 220727O-0072g_17_md.jpg, 221030S-0062e_13_md.jpg ]
+```
+* 上記処理はCSVDataProviderで行う。
 
 ##### gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csv
+* csv→配列(string, string[])に加工する。
+* そのために①-③を行う。
 
-* 配列の0番目(タグのジャンル)とそれ以外(タグ)で二次元配列を作成する。
+① csvのデータは一次元配列で取得する。 
+```
+[ 試合シーン, 投球.打撃.守備.走塁 ]
+```
+② 配列の1番目以降の値で配列を作成する。
+```
+[ 投球.打撃.守備.走塁 ]
+```
+③ 配列の0番目と②で作成した配列を要素として1つの配列を作成する。
+```
+[
+  "試合タイプ",
+  ["公式戦", "日本シリーズ", "オールスター", "フレッシュオールスター"],
+]
+```
+* ①はCSVDataGateway、②-③はCSVDataProviderで行う。
 
 ### ID2
 
-* 本設計に必要な部分のみ記載する。
-<br>
+* 現システムには「imageデータが有効か確認する」という機能が備わっている。
+* 具体的には、imageの要素である「選手名」、「球団名」、「タグ」は決まったデータ一覧の中から選択されていなければエラーとなる。
+* 実装では、「typeof 有効データ配列」で実現しているが、ID1実現後は同じ方法では実現できない。
+* そのため、以下方法で実現する。
 
-* 削除するファイル
+#### 実現方法
 
-| フォルダ/ファイル | | | 理由 |
-|-------------------|-|-|------|
-| data | player | data.ts | 現iw-showroom-webappでは、imageから取得した画像データのplayer要素の型定義のために使用していた。しかし、playerはここでしか使用されていないため、型定義をしなくても問題ないと判断。 |
-| data | player | index.ts | 同上 |
+* 「選手名」は他のコンポーネントで使用されていないため有効かの確認は不要だと判断した。
 
-* 追加するファイル
+①CSVファイル(image.csv、teams.csv、hotTopicTags.csv、gameTypeTags.csv、managerTags.csv、gameSceneTags.csv、situationTags.csv)のデータを取得。
+②imageデータの要素「球団名」がteams.csvから取得したデータに存在するか includes()メソッドを使用して確認する。同じく「タグ」がhotTopicTags.csv、gameTypeTags.csv、managerTags.csv、gameSceneTags.csvから取得したデータに存在するか確認する。
 
-| フォルダ/ファイル | | 概要 |
-|-------------------|-|------|
-| | | | |
-| | | |
-| | | | |
-| | | |
+以上
