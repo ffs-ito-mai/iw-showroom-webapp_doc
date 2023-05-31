@@ -526,6 +526,6 @@ export const playersArray = [
 | TypeUploadDayFilter | 日付フィルターの型 | なし | - | 日付はCSVから取得しないので変更しない。 |
 | TypePlayerName | 選手名の型 | あり | 削除 | 選手名はCSVから取得しているため、値に入力制限をかける型は削除。選手名の型はstringを使用する。 |
 | TypeTagName | タグの型 | あり | 削除 |タグはCSVから取得しているため、値に入力制限をかける型は削除。タグの型はstringを使用する。 |
-
+| TypeLeague | リーグの型 | なし | - | リーグはCSVから取得しないので変更しない。 |
 
 以上
