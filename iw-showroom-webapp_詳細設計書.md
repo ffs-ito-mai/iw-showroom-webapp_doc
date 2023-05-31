@@ -26,6 +26,7 @@
         - [rankingImage.csv、searchWordsRanking.csv、recommendImage.csv、suggestWord.csv、hotTopicTags.csv](#rankingimagecsvsearchwordsrankingcsvrecommendimagecsvsuggestwordcsvhottopictagscsv)
         - [gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csv](#gamescenetagscsvmanagertagscsvgametypetagscsvsituationtagscsv)
     - [ID2](#id2)
+      - [型](#型)
 
 | 版  | 日付         | 担当     | 修正箇所 | 修正内容 |
 |----|------------|--------|------|------|
@@ -495,17 +496,33 @@ gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csv
 
 ### ID2
 
-* 現システムには「imageデータが有効か確認する」という機能が備わっている。具体的には、imageの要素である「選手名」、「球団名」、「タグ」は決まったデータ一覧の中から選択されていなければエラーとなる。
+* 現システムには「データが有効か確認する」という機能が備わっている。具体的には、imageの要素である「選手名」、「球団名」、「タグ」は決まったデータ一覧の中から選択されていなければエラーとなる。
 * ID1完了後はcsvデータ取得タイミングがユーザーアクセス時になり、これを変更するには修正範囲が計画より大きくなる。
 * そのため、本設計ではデータが有効かの確認は行わない。
-* 既存の型は、以下のように変更する。
+* 現システムでは、データの要素に想定外の値が入力されるとビルドエラーとなるが、変更後システムではエラーとならない。
 
-| 変更前型名 | 変更あり/なし | 変更後 | 理由 |
-|--------|------|-------|------|
-| TypeImageName | あり | string | 画像が有効かの判定に使用しているため変更 |
-| TypeTeamName | あり | string | 球団が有効かの判定に使用しているため変更 |
-| TypePriceFilter | なし | - | 値段はCSVから取得しないので変更しない |
-| TypeTeamFilter | あり | string |  球団フィルターの値が有効かの判定に使用しているため変更 |
-| TypeUploadDayFilter | なし | - | 日付はCSVから取得しないので変更しない |
+#### 型
+* 現システムでは、型定義の際に、特定の配列に存在する値しか入力できないように設定している。
+```
+例：
+export type TypePlayerName = typeof playersArray[number];
+
+export const playersArray = [
+  "村上宗隆",
+  "岡林勇希",
+  "近本光司",
+  …
+  ] as const satisfies readonly string[];
+```
+* データが有効かの確認は行わないので、型を修正する。
+* 以下、現システムに存在する型と、変更後である。
+
+| 変更前型名 | 詳細 | 変更あり/なし | 変更後 | 理由 |
+|------------|------|---------------|--------|------|
+| TypeImageName | 画像名 | あり | 削除 | 画像名はCSVから取得しているため、値に入力制限をかける型は削除。画像名の型はstringを使用する。 |
+| TypeTeamName | 球団名 | あり | 削除 | 球団名はCSVから取得しているため、値に入力制限をかける型は削除。球団名の型はstringを使用する。 |
+| TypePriceFilter | 値段 | なし | - | 値段はCSVから取得しないので変更しない。 |
+| TypeTeamFilter | 球団フィルター | あり | string |  球団名はCSVから取得しているため、球団フィルターに入力制限をかける型は削除。球団フィルターの型はstringを使用する。 |
+| TypeUploadDayFilter | 日付フィルター | なし | - | 日付はCSVから取得しないので変更しない。 |
 
 以上
