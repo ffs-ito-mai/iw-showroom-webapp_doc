@@ -209,10 +209,9 @@
 ##### シーケンス図
 
 * ID1-1より、CSVファイルは11ファイル作成するため、それぞれの取得タイミングを決定する。
-* CSVファイルからデータを取得する際は、非同期処理で行う。その際、Promise.allを使用する。
+* CSVファイルからデータを取得する際は、非同期処理で行う。その際、Promiseを使用する。
 * 取得した値は、providerでstaticな変数として保持する。2回目以降はその値を参照する。
 * CSVファイルの記載方法、CSVから取得したデータの加工はID1-3にて詳細を記載する。
-* imageからデータ取得する際は、imageの要素「teams」「tag」がteams.csv、tag.csvに存在するかのチェックを行う。(詳細はID2にて記載)
 * tag.csvは4つのcsvデータを合わせた値を参照する。
 * 複数箇所あるが同様の方法のため、例としてHeroコンポーネントの場合を記載する。
  
@@ -220,6 +219,24 @@
 
 * データ取得が2回目以降 
 ![picture 55](images/5be85db65b67e8ff0e06212f42fc91d10b7d88f2a4ac22f7869bfa76fd6dda74.png)  
+
+* team.csvは、部品コンポーネントで使用しておらず、リーグ情報オブジェクトを作るために使用している。
+* そのため、書き換え後は、Providerでteam.csvデータを使用しLeagueDataオブジェクトを作成し、それを部品コンポーネントへ渡す。
+```
+ export const LeagueData = {
+  central: {
+    name: "一般製品",
+    color: "#37922E",
+    teams: CSVでリーグがcentralになっている球団情報
+  },
+  pacific: {
+    name: "医療製品",
+    color: "#45B1E5",
+    teams: CSVでリーグがcentralになっている球団情報
+  }
+}
+```
+![picture 58](images/234d3532d8fa50644afd22a23632537b661efa12dff8c07666142b1a850f52e9.png)  
 
 ###### providerの関数
 
