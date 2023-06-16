@@ -27,6 +27,7 @@
         - [gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csv](#gamescenetagscsvmanagertagscsvgametypetagscsvsituationtagscsv)
     - [ID2](#id2)
       - [型](#型)
+  - [実装でのwarning](#実装でのwarning)
 
 | 版  | 日付         | 担当     | 修正箇所 | 修正内容 |
 |----|------------|--------|------|------|
@@ -544,5 +545,13 @@ export const playersArray = [
 | TypePlayerName | 選手名の型 | あり | 削除 | 選手名はCSVから取得しているため、値に入力制限をかける型は削除。選手名の型はstringを使用する。 |
 | TypeTagName | タグの型 | あり | 削除 |タグはCSVから取得しているため、値に入力制限をかける型は削除。タグの型はstringを使用する。 |
 | TypeLeague | リーグの型 | あり | 削除 | リーグはCSVから取得しているため、値に入力制限をかける型は削除。リーグの型はstringを使用する。 |
+
+## 実装でのwarning
+
+* csvからデータを取得する際に、useEffectの第二引数を空にするとwarningが発生する。
+* このwarningは、modeが引数として渡ってきているが、modeが変わってもuseEffectが動作しないこと(modeとuseEffectは依存関係ではないのか)を警告として出している。
+* 今回は、modeの値は初期値から変更がないため、modeとuseEffectは依存関係ではない。そのため、useEffectの第二引数にmodeを設定する必要はない。
+* 第二引数を入れずにwarningを解消する方法がないため、警告が出ている状態となっている。
+
 
 以上
