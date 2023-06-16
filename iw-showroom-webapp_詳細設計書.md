@@ -26,6 +26,8 @@
         - [rankingImage.csv、searchWordsRanking.csv、recommendImage.csv、suggestWord.csv、hotTopicTags.csv](#rankingimagecsvsearchwordsrankingcsvrecommendimagecsvsuggestwordcsvhottopictagscsv)
         - [gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csv](#gamescenetagscsvmanagertagscsvgametypetagscsvsituationtagscsv)
     - [ID2](#id2)
+      - [型](#型)
+  - [実装でのwarning](#実装でのwarning)
 
 | 版  | 日付         | 担当     | 修正箇所 | 修正内容 |
 |----|------------|--------|------|------|
@@ -208,10 +210,9 @@
 ##### シーケンス図
 
 * ID1-1より、CSVファイルは11ファイル作成するため、それぞれの取得タイミングを決定する。
-* CSVファイルからデータを取得する際は、非同期処理で行う。その際、Promise.allを使用する。
+* CSVファイルからデータを取得する際は、非同期処理で行う。その際、Promiseを使用する。
 * 取得した値は、providerでstaticな変数として保持する。2回目以降はその値を参照する。
 * CSVファイルの記載方法、CSVから取得したデータの加工はID1-3にて詳細を記載する。
-* imageからデータ取得する際は、imageの要素「teams」「tag」がteams.csv、tag.csvに存在するかのチェックを行う。(詳細はID2にて記載)
 * tag.csvは4つのcsvデータを合わせた値を参照する。
 * 複数箇所あるが同様の方法のため、例としてHeroコンポーネントの場合を記載する。
  
@@ -219,6 +220,24 @@
 
 * データ取得が2回目以降 
 ![picture 55](images/5be85db65b67e8ff0e06212f42fc91d10b7d88f2a4ac22f7869bfa76fd6dda74.png)  
+
+* team.csvは、部品コンポーネントで使用しておらず、リーグ情報オブジェクトを作るために使用している。
+* そのため、書き換え後は、Providerでteam.csvデータを使用しLeagueDataオブジェクトを作成し、それを部品コンポーネントへ渡す。
+```
+ export const LeagueData = {
+  central: {
+    name: "一般製品",
+    color: "#37922E",
+    teams: CSVでリーグがcentralになっている球団情報
+  },
+  pacific: {
+    name: "医療製品",
+    color: "#45B1E5",
+    teams: CSVでリーグがcentralになっている球団情報
+  }
+}
+```
+![picture 58](images/234d3532d8fa50644afd22a23632537b661efa12dff8c07666142b1a850f52e9.png)  
 
 ###### providerの関数
 
@@ -332,7 +351,7 @@
 #### CSVの記載方法
 
 * 各要素は「,」で区切って記載する。
-* 要素が複数あるもの(選手名、球団名、タグ、兄弟写真)は最大値を設定する。最大値以下の場合は空欄にしておく。
+* 要素が複数あるもの(選手名、球団名、タグ、兄弟写真、旧球団名)は最大値を設定する。最大値以下の場合は空欄にしておく。
 
 | 要素 | 最大値 |
 |--------|------|
@@ -340,6 +359,7 @@
 | 球団名 | 5 |
 | タグ | 5 |
 | 兄弟写真 | 5 |
+| 旧球団名 | 5 |
 
 * priceは全ての画像データで同じため、CSVからデータ取得後に値を設定する。
 
@@ -494,8 +514,44 @@ gameSceneTags.csv、managerTags.csv、gameTypeTags.csv、situationTags.csv
 
 ### ID2
 
-* 現システムには「imageデータが有効か確認する」という機能が備わっている。具体的には、imageの要素である「選手名」、「球団名」、「タグ」は決まったデータ一覧の中から選択されていなければエラーとなる。
+* 現システムには「データが有効か確認する」という機能が備わっている。具体的には、imageの要素である「選手名」、「球団名」、「タグ」は決まったデータ一覧の中から選択されていなければエラーとなる。
 * ID1完了後はcsvデータ取得タイミングがユーザーアクセス時になり、これを変更するには修正範囲が計画より大きくなる。
-* そのため、本設計での変更は行わない。
+* そのため、本設計ではデータが有効かの確認は行わない。
+* 現システムでは、データの要素に想定外の値が入力されるとビルドエラーとなるが、変更後システムではエラーとならない。
+
+#### 型
+* 現システムでは、型定義の際に、特定の配列に存在する値しか入力できないように設定している。
+```
+例：
+export type TypePlayerName = typeof playersArray[number];
+
+export const playersArray = [
+  "村上宗隆",
+  "岡林勇希",
+  "近本光司",
+  …
+  ] as const satisfies readonly string[];
+```
+* データが有効かの確認は行わないので、型を修正する。
+* 以下、現システムに存在する型と、変更後である。
+
+| 変更前型名 | 詳細 | 変更あり/なし | 変更後 | 理由 |
+|------------|------|---------------|--------|------|
+| TypeImageName | 画像名の型 | あり | 削除 | 画像名はCSVから取得しているため、値に入力制限をかける型は削除。画像名の型はstringを使用する。 |
+| TypeTeamName | 球団名の型 | あり | 削除 | 球団名はCSVから取得しているため、値に入力制限をかける型は削除。球団名の型はstringを使用する。 |
+| TypePriceFilter | 値段の型 | なし | - | 値段はCSVから取得しないので変更しない。 |
+| TypeTeamFilter | 球団フィルターの型 | あり | 削除 |  球団名はCSVから取得しているため、球団フィルターに入力制限をかける型は削除。球団フィルターの型はstringを使用する。 |
+| TypeUploadDayFilter | 日付フィルターの型 | なし | - | 日付はCSVから取得しないので変更しない。 |
+| TypePlayerName | 選手名の型 | あり | 削除 | 選手名はCSVから取得しているため、値に入力制限をかける型は削除。選手名の型はstringを使用する。 |
+| TypeTagName | タグの型 | あり | 削除 |タグはCSVから取得しているため、値に入力制限をかける型は削除。タグの型はstringを使用する。 |
+| TypeLeague | リーグの型 | あり | 削除 | リーグはCSVから取得しているため、値に入力制限をかける型は削除。リーグの型はstringを使用する。 |
+
+## 実装でのwarning
+
+* csvからデータを取得する際に、useEffectの第二引数を空にするとwarningが発生する。
+* このwarningは、modeが引数として渡ってきているが、modeが変わってもuseEffectが動作しないこと(modeとuseEffectは依存関係ではないのか)を警告として出している。
+* 今回は、modeの値は初期値から変更がないため、modeとuseEffectは依存関係ではない。そのため、useEffectの第二引数にmodeを設定する必要はない。
+* 第二引数を入れずにwarningを解消する方法がないため、警告が出ている状態となっている。
+
 
 以上
